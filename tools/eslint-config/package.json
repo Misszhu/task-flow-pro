@@ -1,0 +1,11 @@
+{
+  "name": "@task-flow-pro/eslint-config",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build needed'",
+    "dev": "echo 'No dev needed'",
+    "clean": "echo 'No clean needed'"
+  }
+}

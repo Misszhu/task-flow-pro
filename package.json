@@ -1,0 +1,23 @@
+{
+  "name": "task-flow-pro",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@8.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tools/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "dev:frontend": "turbo run dev --filter=@task-flow-pro/frontend",
+    "dev:backend": "turbo run dev --filter=@task-flow-pro/backend",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.12"
+  }
+}

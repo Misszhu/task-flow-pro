@@ -1,0 +1,16 @@
+{
+  "name": "@task-flow-pro/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@task-flow-pro/typescript-config": "*",
+    "typescript": "^4.9.5"
+  }
+}
