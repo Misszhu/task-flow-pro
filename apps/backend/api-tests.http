@@ -1,0 +1,97 @@
+### Task Flow Pro API 测试文件
+### 使用 VS Code REST Client 扩展或 IntelliJ HTTP Client 运行
+
+@baseUrl = http://localhost:3001
+@projectId = project123
+@userId = user456
+
+### 1. 基础接口
+
+### 获取API信息
+GET {{baseUrl}}/
+
+### 2. 健康检查
+
+### 健康检查
+GET {{baseUrl}}/api/health
+
+### 数据库连接测试
+GET {{baseUrl}}/api/health/test-db
+
+### 3. 项目管理
+
+### 获取所有项目
+GET {{baseUrl}}/api/projects
+
+### 创建新项目
+POST {{baseUrl}}/api/projects
+Content-Type: application/json
+
+{
+  "name": "测试项目",
+  "ownerId": "user123",
+  "visibility": "PRIVATE",
+  "description": "这是一个测试项目",
+  "deadline": "2024-12-31T23:59:59.000Z"
+}
+
+### 获取单个项目
+GET {{baseUrl}}/api/projects/{{projectId}}
+
+### 4. 项目成员管理
+
+### 添加项目成员
+POST {{baseUrl}}/api/projects/{{projectId}}/members
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "role": "COLLABORATOR"
+}
+
+### 获取项目成员列表
+GET {{baseUrl}}/api/projects/{{projectId}}/members
+
+### 更新成员角色
+PUT {{baseUrl}}/api/projects/{{projectId}}/members/{{userId}}
+Content-Type: application/json
+
+{
+  "role": "MANAGER"
+}
+
+### 移除项目成员
+DELETE {{baseUrl}}/api/projects/{{projectId}}/members/{{userId}}
+
+### 5. 测试场景
+
+### 完整流程测试：创建项目 -> 添加成员 -> 更新角色 -> 移除成员
+# 1. 创建项目
+POST {{baseUrl}}/api/projects
+Content-Type: application/json
+
+{
+  "name": "完整流程测试项目",
+  "ownerId": "owner123",
+  "description": "测试完整的工作流程"
+}
+
+# 2. 添加成员（需要替换上面返回的项目ID）
+# POST {{baseUrl}}/api/projects/REPLACE_WITH_PROJECT_ID/members
+# Content-Type: application/json
+# 
+# {
+#   "userId": "member123",
+#   "role": "VIEWER"
+# }
+
+# 3. 更新成员角色
+# PUT {{baseUrl}}/api/projects/REPLACE_WITH_PROJECT_ID/members/member123
+# Content-Type: application/json
+# 
+# {
+#   "role": "MANAGER"
+# }
+
+# 4. 移除成员
+# DELETE {{baseUrl}}/api/projects/REPLACE_WITH_PROJECT_ID/members/member123

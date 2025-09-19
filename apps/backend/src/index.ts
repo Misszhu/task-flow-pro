@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { setupSwagger } from './swagger-setup';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -11,6 +12,9 @@ const PORT = process.env.PORT || 3001;
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// Swagger文档
+setupSwagger(app);
 
 // 路由
 app.use('/', routes);
