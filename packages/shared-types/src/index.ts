@@ -3,7 +3,16 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'project_manager' | 'user';
+  role: 'ADMIN' | 'PROJECT_MANAGER' | 'USER';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserWithoutPassword {
+  id: string;
+  email: string;
+  name: string;
+  role: 'ADMIN' | 'PROJECT_MANAGER' | 'USER';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -70,9 +79,21 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-  user: User;
+  user: UserWithoutPassword;
   token: string;
   refreshToken: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface JwtPayload {
+  userId: string;
+  email: string;
+  role: 'ADMIN' | 'PROJECT_MANAGER' | 'USER';
+  iat?: number;
+  exp?: number;
 }
 
 // 任务相关请求类型

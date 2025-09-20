@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import healthRoutes from './health.routes';
 import projectRoutes from './projects/project.routes';
+import authRoutes from './auth/auth.routes';
 
 const router: Router = Router();
 
@@ -11,6 +12,7 @@ router.get('/', (req, res) => {
 
 // API 路由
 router.use('/api/health', healthRoutes);
+router.use('/api/auth', authRoutes);
 router.use('/api/projects', projectRoutes);
 
 export default router;

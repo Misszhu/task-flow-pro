@@ -16,6 +16,20 @@ const options = {
         description: '开发环境',
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   apis: ['./src/routes/**/*.ts', './src/controllers/**/*.ts'], // 扫描这些文件
 };
