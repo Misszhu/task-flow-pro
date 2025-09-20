@@ -40,7 +40,22 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 GET http://localhost:3001/api/projects
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 7. 测试错误响应格式
+### 7. 创建项目 (需要认证)
+POST http://localhost:3001/api/projects
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "name": "我的项目",
+  "description": "项目描述",
+  "visibility": "PRIVATE"
+}
+
+### 8. 获取项目成员 (需要认证)
+GET http://localhost:3001/api/projects/PROJECT_ID/members
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 9. 测试错误响应格式
 POST http://localhost:3001/api/auth/register
 Content-Type: application/json
 

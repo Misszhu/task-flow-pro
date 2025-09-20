@@ -22,10 +22,17 @@ export class ProjectController {
   // 创建新项目
   async createProject(req: Request, res: Response): Promise<void> {
     try {
-      const { name, ownerId, visibility = 'PRIVATE', description, deadline } = req.body;
+      const { name, visibility = 'PRIVATE', description, deadline } = req.body;
+
+      // 从认证用户获取ownerId
+      if (!req.user) {
+        ResponseUtil.unauthorized(res, '未认证');
+        return;
+      }
+
       const project = await this.projectService.createProject({
         name,
-        ownerId,
+        ownerId: req.user.userId,
         visibility,
         description,
         deadline: deadline ? new Date(deadline) : null

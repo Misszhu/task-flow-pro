@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { ProjectController } from '../../controllers/projects/projectController';
+import { authenticateToken, requireRole } from '../../middleware/auth';
 
 const router: Router = Router();
 const projectController = new ProjectController();
@@ -11,6 +12,8 @@ const projectController = new ProjectController();
  *     summary: 获取所有项目
  *     description: 获取所有项目列表
  *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: 成功获取项目列表
@@ -27,7 +30,7 @@ const projectController = new ProjectController();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/', projectController.getAllProjects.bind(projectController));
+router.get('/', authenticateToken, projectController.getAllProjects.bind(projectController));
 
 /**
  * @swagger
@@ -36,6 +39,8 @@ router.get('/', projectController.getAllProjects.bind(projectController));
  *     summary: 创建新项目
  *     description: 创建新项目
  *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -56,7 +61,7 @@ router.get('/', projectController.getAllProjects.bind(projectController));
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/', projectController.createProject.bind(projectController));
+router.post('/', authenticateToken, projectController.createProject.bind(projectController));
 
 /**
  * @swagger
@@ -65,6 +70,8 @@ router.post('/', projectController.createProject.bind(projectController));
  *     summary: 获取单个项目
  *     description: 根据ID获取项目详情
  *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -92,7 +99,7 @@ router.post('/', projectController.createProject.bind(projectController));
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:id', projectController.getProjectById.bind(projectController));
+router.get('/:id', authenticateToken, projectController.getProjectById.bind(projectController));
 
 /**
  * @swagger
@@ -101,6 +108,8 @@ router.get('/:id', projectController.getProjectById.bind(projectController));
  *     summary: 添加项目成员
  *     description: 向项目添加新成员
  *     tags: [Project Members]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: projectId
@@ -140,7 +149,7 @@ router.get('/:id', projectController.getProjectById.bind(projectController));
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/:projectId/members', projectController.addProjectMember.bind(projectController));
+router.post('/:projectId/members', authenticateToken, projectController.addProjectMember.bind(projectController));
 
 /**
  * @swagger
@@ -149,6 +158,8 @@ router.post('/:projectId/members', projectController.addProjectMember.bind(proje
  *     summary: 获取项目成员列表
  *     description: 获取项目的所有成员
  *     tags: [Project Members]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: projectId
@@ -172,7 +183,7 @@ router.post('/:projectId/members', projectController.addProjectMember.bind(proje
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:projectId/members', projectController.getProjectMembers.bind(projectController));
+router.get('/:projectId/members', authenticateToken, projectController.getProjectMembers.bind(projectController));
 
 /**
  * @swagger
@@ -181,6 +192,8 @@ router.get('/:projectId/members', projectController.getProjectMembers.bind(proje
  *     summary: 更新项目成员角色
  *     description: 更新项目成员的角色
  *     tags: [Project Members]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: projectId
@@ -220,7 +233,7 @@ router.get('/:projectId/members', projectController.getProjectMembers.bind(proje
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/:projectId/members/:userId', projectController.updateProjectMemberRole.bind(projectController));
+router.put('/:projectId/members/:userId', authenticateToken, projectController.updateProjectMemberRole.bind(projectController));
 
 /**
  * @swagger
@@ -229,6 +242,8 @@ router.put('/:projectId/members/:userId', projectController.updateProjectMemberR
  *     summary: 移除项目成员
  *     description: 从项目中移除成员
  *     tags: [Project Members]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: projectId
@@ -260,6 +275,6 @@ router.put('/:projectId/members/:userId', projectController.updateProjectMemberR
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/:projectId/members/:userId', projectController.removeProjectMember.bind(projectController));
+router.delete('/:projectId/members/:userId', authenticateToken, projectController.removeProjectMember.bind(projectController));
 
 export default router;
