@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ProjectService } from '../../services/projects/projectService';
+import { ResponseUtil } from '../../utils/response';
 
 export class ProjectController {
   private projectService: ProjectService;
@@ -12,9 +13,9 @@ export class ProjectController {
   async getAllProjects(req: Request, res: Response): Promise<void> {
     try {
       const projects = await this.projectService.getAllProjects();
-      res.json(projects);
+      ResponseUtil.success(res, projects, '获取项目列表成功');
     } catch (error) {
-      res.status(500).json({ error: '获取项目列表失败', details: error });
+      ResponseUtil.serverError(res, '获取项目列表失败');
     }
   }
 
@@ -29,9 +30,9 @@ export class ProjectController {
         description,
         deadline: deadline ? new Date(deadline) : null
       });
-      res.status(201).json(project);
+      ResponseUtil.created(res, project, '创建项目成功');
     } catch (error) {
-      res.status(500).json({ error: '创建项目失败', details: error });
+      ResponseUtil.serverError(res, '创建项目失败');
     }
   }
 
@@ -42,13 +43,13 @@ export class ProjectController {
       const project = await this.projectService.getProjectById(id);
 
       if (!project) {
-        res.status(404).json({ error: '项目不存在' });
+        ResponseUtil.notFound(res, '项目不存在');
         return;
       }
 
-      res.json(project);
+      ResponseUtil.success(res, project, '获取项目成功');
     } catch (error) {
-      res.status(500).json({ error: '获取项目失败', details: error });
+      ResponseUtil.serverError(res, '获取项目失败');
     }
   }
 

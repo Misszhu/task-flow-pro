@@ -46,8 +46,17 @@ export interface Task {
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
-  error?: string;
   message?: string;
+  error?: string;
+}
+
+// 统一响应结构
+export interface StandardResponse<T = any> {
+  data: T;
+  message: string;
+  success: boolean;
+  statusCode: number;
+  timestamp?: string;
 }
 
 // 分页类型

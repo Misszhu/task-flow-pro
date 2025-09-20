@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth/authService';
+import { ResponseUtil } from '../utils/response';
 import { JwtPayload } from '@task-flow-pro/shared-types';
 
 // 扩展Request接口以包含用户信息
@@ -24,10 +25,7 @@ export const authenticateToken = async (
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-      res.status(401).json({
-        success: false,
-        error: '访问令牌缺失'
-      });
+      ResponseUtil.unauthorized(res, '访问令牌缺失');
       return;
     }
 
@@ -36,10 +34,7 @@ export const authenticateToken = async (
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(403).json({
-      success: false,
-      error: '无效的访问令牌'
-    });
+    ResponseUtil.forbidden(res, '无效的访问令牌');
   }
 };
 
@@ -49,18 +44,12 @@ export const authenticateToken = async (
 export const requireRole = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      res.status(401).json({
-        success: false,
-        error: '未认证'
-      });
+      ResponseUtil.unauthorized(res, '未认证');
       return;
     }
 
     if (!roles.includes(req.user.role)) {
-      res.status(403).json({
-        success: false,
-        error: '权限不足'
-      });
+      ResponseUtil.forbidden(res, '权限不足');
       return;
     }
 

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../../services/auth/authService';
+import { ResponseUtil } from '../../utils/response';
 import {
   LoginRequest,
   RegisterRequest,
-  RefreshTokenRequest,
-  ApiResponse
+  RefreshTokenRequest
 } from '@task-flow-pro/shared-types';
 
 export class AuthController {
@@ -18,44 +18,28 @@ export class AuthController {
 
       // 验证必填字段
       if (!email || !password || !name) {
-        res.status(400).json({
-          success: false,
-          error: '邮箱、密码和姓名都是必填字段'
-        });
+        ResponseUtil.error(res, '邮箱、密码和姓名都是必填字段', 400);
         return;
       }
 
       // 验证邮箱格式
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        res.status(400).json({
-          success: false,
-          error: '邮箱格式不正确'
-        });
+        ResponseUtil.error(res, '邮箱格式不正确', 400);
         return;
       }
 
       // 验证密码长度
       if (password.length < 6) {
-        res.status(400).json({
-          success: false,
-          error: '密码长度至少6位'
-        });
+        ResponseUtil.error(res, '密码长度至少6位', 400);
         return;
       }
 
       const result = await AuthService.register({ email, password, name });
 
-      res.status(201).json({
-        success: true,
-        data: result,
-        message: '注册成功'
-      });
+      ResponseUtil.created(res, result, '注册成功');
     } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : '注册失败'
-      });
+      ResponseUtil.error(res, error instanceof Error ? error.message : '注册失败', 400);
     }
   }
 
@@ -69,25 +53,15 @@ export class AuthController {
 
       // 验证必填字段
       if (!email || !password) {
-        res.status(400).json({
-          success: false,
-          error: '邮箱和密码都是必填字段'
-        });
+        ResponseUtil.error(res, '邮箱和密码都是必填字段', 400);
         return;
       }
 
       const result = await AuthService.login({ email, password });
 
-      res.json({
-        success: true,
-        data: result,
-        message: '登录成功'
-      });
+      ResponseUtil.success(res, result, '登录成功');
     } catch (error) {
-      res.status(401).json({
-        success: false,
-        error: error instanceof Error ? error.message : '登录失败'
-      });
+      ResponseUtil.unauthorized(res, error instanceof Error ? error.message : '登录失败');
     }
   }
 
@@ -100,25 +74,15 @@ export class AuthController {
       const { refreshToken }: RefreshTokenRequest = req.body;
 
       if (!refreshToken) {
-        res.status(400).json({
-          success: false,
-          error: 'refresh token是必填字段'
-        });
+        ResponseUtil.error(res, 'refresh token是必填字段', 400);
         return;
       }
 
       const result = await AuthService.refreshToken({ refreshToken });
 
-      res.json({
-        success: true,
-        data: result,
-        message: 'Token刷新成功'
-      });
+      ResponseUtil.success(res, result, 'Token刷新成功');
     } catch (error) {
-      res.status(401).json({
-        success: false,
-        error: error instanceof Error ? error.message : 'Token刷新失败'
-      });
+      ResponseUtil.unauthorized(res, error instanceof Error ? error.message : 'Token刷新失败');
     }
   }
 
@@ -129,33 +93,20 @@ export class AuthController {
   static async getCurrentUser(req: Request, res: Response): Promise<void> {
     try {
       if (!req.user) {
-        res.status(401).json({
-          success: false,
-          error: '未认证'
-        });
+        ResponseUtil.unauthorized(res, '未认证');
         return;
       }
 
       const user = await AuthService.getUserById(req.user.userId);
 
       if (!user) {
-        res.status(404).json({
-          success: false,
-          error: '用户不存在'
-        });
+        ResponseUtil.notFound(res, '用户不存在');
         return;
       }
 
-      res.json({
-        success: true,
-        data: user,
-        message: '获取用户信息成功'
-      });
+      ResponseUtil.success(res, user, '获取用户信息成功');
     } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: '获取用户信息失败'
-      });
+      ResponseUtil.serverError(res, '获取用户信息失败');
     }
   }
 
@@ -166,9 +117,6 @@ export class AuthController {
   static async logout(req: Request, res: Response): Promise<void> {
     // 由于JWT是无状态的，登出主要是客户端删除token
     // 这里可以添加token黑名单逻辑（可选）
-    res.json({
-      success: true,
-      message: '登出成功'
-    });
+    ResponseUtil.success(res, null, '登出成功');
   }
 }
