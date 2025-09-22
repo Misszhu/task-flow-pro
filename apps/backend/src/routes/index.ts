@@ -8,6 +8,9 @@ import cacheRoutes from './cache/cache.routes';
 import notificationRoutes from './notifications/notification.routes';
 import fileUploadRoutes from './files/fileUpload.routes';
 import timeTrackingRoutes from './timeTracking/timeTracking.routes';
+import taskDependencyRoutes from './taskDependencies/taskDependency.routes';
+import taskTemplateRoutes from './taskTemplates/taskTemplate.routes';
+import websocketRoutes from './websocket/websocket.routes';
 import v1Routes from './v1/index';
 import { apiVersioning, addVersionInfo } from '../middleware/versioning';
 import { globalRateLimit } from '../middleware/rateLimiting';
@@ -33,6 +36,9 @@ router.use('/api/tasks', taskCollaborationRoutes);
 router.use('/api/notifications', notificationRoutes);
 router.use('/api/files', fileUploadRoutes);
 router.use('/api/time-tracking', timeTrackingRoutes);
+router.use('/api/task-dependencies', taskDependencyRoutes);
+router.use('/api/task-templates', taskTemplateRoutes);
+router.use('/api/websocket', websocketRoutes);
 router.use('/api/cache', cacheRoutes);
 
 // 版本化 API 路由
