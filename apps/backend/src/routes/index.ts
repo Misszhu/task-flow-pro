@@ -2,6 +2,8 @@ import { Router } from 'express';
 import healthRoutes from './health.routes';
 import projectRoutes from './projects/project.routes';
 import authRoutes from './auth/auth.routes';
+import taskRoutes from './tasks/task.routes';
+import taskCollaborationRoutes from './tasks/taskCollaboration.routes';
 
 const router: Router = Router();
 
@@ -14,5 +16,7 @@ router.get('/', (req, res) => {
 router.use('/api/health', healthRoutes);
 router.use('/api/auth', authRoutes);
 router.use('/api/projects', projectRoutes);
+router.use('/api/tasks', taskRoutes);
+router.use('/api/tasks', taskCollaborationRoutes);
 
 export default router;

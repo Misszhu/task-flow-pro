@@ -1,0 +1,265 @@
+### 任务协作功能API测试文件
+
+# 变量定义
+@baseUrl = http://localhost:3001
+@token = Bearer YOUR_JWT_TOKEN_HERE
+@taskId = YOUR_TASK_ID_HERE
+
+### ==================== 任务评论功能 ====================
+
+### 1. 创建任务评论
+POST {{baseUrl}}/api/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "content": "这是一个任务评论，用于测试评论功能。"
+}
+
+### 2. 创建另一个评论
+POST {{baseUrl}}/api/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "content": "这是第二个评论，用于测试多个评论的显示。"
+}
+
+### 3. 获取任务评论列表
+GET {{baseUrl}}/api/tasks/{{taskId}}/comments?page=1&limit=10
+Authorization: {{token}}
+
+### 4. 更新评论
+PUT {{baseUrl}}/api/tasks/comments/COMMENT_ID_HERE
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "content": "这是更新后的评论内容。"
+}
+
+### 5. 删除评论
+DELETE {{baseUrl}}/api/tasks/comments/COMMENT_ID_HERE
+Authorization: {{token}}
+
+### ==================== 任务标签功能 ====================
+
+### 6. 创建标签
+POST {{baseUrl}}/api/tasks/tags
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "高优先级",
+  "color": "#ff6b6b"
+}
+
+### 7. 创建更多标签
+POST {{baseUrl}}/api/tasks/tags
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "前端开发",
+  "color": "#4ecdc4"
+}
+
+### 8. 创建第三个标签
+POST {{baseUrl}}/api/tasks/tags
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "紧急修复",
+  "color": "#ff9f43"
+}
+
+### 9. 获取所有标签
+GET {{baseUrl}}/api/tasks/tags?page=1&limit=20
+Authorization: {{token}}
+
+### 10. 搜索标签
+GET {{baseUrl}}/api/tasks/tags/search?q=前端&page=1&limit=10
+Authorization: {{token}}
+
+### 11. 为任务分配标签
+PATCH {{baseUrl}}/api/tasks/{{taskId}}/tags
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "tagIds": ["TAG_ID_1", "TAG_ID_2"]
+}
+
+### 12. 获取任务的标签
+GET {{baseUrl}}/api/tasks/{{taskId}}/tags
+Authorization: {{token}}
+
+### ==================== 子任务功能 ====================
+
+### 13. 创建子任务
+POST {{baseUrl}}/api/tasks/{{taskId}}/subtasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "设计数据库表结构",
+  "description": "为任务管理系统设计用户、任务、项目等相关表结构",
+  "priority": "HIGH",
+  "dueDate": "2024-02-15T18:00:00.000Z"
+}
+
+### 14. 创建第二个子任务
+POST {{baseUrl}}/api/tasks/{{taskId}}/subtasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "实现API接口",
+  "description": "实现任务的CRUD操作API接口",
+  "priority": "MEDIUM",
+  "dueDate": "2024-02-20T18:00:00.000Z"
+}
+
+### 15. 创建第三个子任务
+POST {{baseUrl}}/api/tasks/{{taskId}}/subtasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "编写单元测试",
+  "description": "为所有API接口编写单元测试",
+  "priority": "LOW",
+  "dueDate": "2024-02-25T18:00:00.000Z"
+}
+
+### 16. 获取子任务列表
+GET {{baseUrl}}/api/tasks/{{taskId}}/subtasks?page=1&limit=10
+Authorization: {{token}}
+
+### ==================== 活动日志功能 ====================
+
+### 17. 获取任务活动日志
+GET {{baseUrl}}/api/tasks/{{taskId}}/activities?page=1&limit=20
+Authorization: {{token}}
+
+### 18. 获取我的活动日志
+GET {{baseUrl}}/api/tasks/activities/my?page=1&limit=20
+Authorization: {{token}}
+
+### 19. 获取任务活动统计
+GET {{baseUrl}}/api/tasks/{{taskId}}/activities/stats
+Authorization: {{token}}
+
+### ==================== 错误测试 ====================
+
+### 20. 测试创建评论 - 缺少内容
+POST {{baseUrl}}/api/tasks/{{taskId}}/comments
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "content": ""
+}
+
+### 21. 测试创建标签 - 缺少名称
+POST {{baseUrl}}/api/tasks/tags
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "color": "#ff6b6b"
+}
+
+### 22. 测试创建子任务 - 缺少标题
+POST {{baseUrl}}/api/tasks/{{taskId}}/subtasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "description": "只有描述没有标题的子任务"
+}
+
+### 23. 测试搜索标签 - 缺少搜索词
+GET {{baseUrl}}/api/tasks/tags/search?page=1&limit=10
+Authorization: {{token}}
+
+### 24. 测试访问不存在的任务评论
+GET {{baseUrl}}/api/tasks/nonexistent_task_id/comments
+Authorization: {{token}}
+
+### 25. 测试访问不存在的任务活动
+GET {{baseUrl}}/api/tasks/nonexistent_task_id/activities
+Authorization: {{token}}
+
+### ==================== 权限测试 ====================
+
+### 26. 测试无认证访问评论
+GET {{baseUrl}}/api/tasks/{{taskId}}/comments
+
+### 27. 测试无认证创建标签
+POST {{baseUrl}}/api/tasks/tags
+Content-Type: application/json
+
+{
+  "name": "无认证标签"
+}
+
+### 28. 测试无认证创建子任务
+POST {{baseUrl}}/api/tasks/{{taskId}}/subtasks
+Content-Type: application/json
+
+{
+  "title": "无认证子任务"
+}
+
+### ==================== 综合测试 ====================
+
+### 29. 完整的工作流程测试 - 创建任务并添加协作内容
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "协作功能测试任务",
+  "description": "这是一个用于测试协作功能的完整任务",
+  "priority": "HIGH",
+  "dueDate": "2024-03-01T18:00:00.000Z"
+}
+
+### 30. 为新任务添加评论
+POST {{baseUrl}}/api/tasks/NEW_TASK_ID/comments
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "content": "开始处理这个协作功能测试任务"
+}
+
+### 31. 为新任务分配标签
+PATCH {{baseUrl}}/api/tasks/NEW_TASK_ID/tags
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "tagIds": ["TAG_ID_1", "TAG_ID_2", "TAG_ID_3"]
+}
+
+### 32. 为新任务创建子任务
+POST {{baseUrl}}/api/tasks/NEW_TASK_ID/subtasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "测试子任务1",
+  "description": "这是第一个子任务",
+  "priority": "MEDIUM"
+}
+
+### 33. 查看新任务的所有协作内容
+GET {{baseUrl}}/api/tasks/NEW_TASK_ID
+Authorization: {{token}}
+
+### 34. 查看新任务的活动日志
+GET {{baseUrl}}/api/tasks/NEW_TASK_ID/activities
+Authorization: {{token}}

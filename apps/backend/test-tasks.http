@@ -1,0 +1,153 @@
+### 任务管理API测试文件
+
+# 变量定义
+@baseUrl = http://localhost:3001
+@token = Bearer YOUR_JWT_TOKEN_HERE
+
+### 1. 创建任务
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "实现用户认证功能",
+  "description": "完成JWT认证系统的开发，包括注册、登录、权限验证等功能",
+  "priority": "HIGH",
+  "projectId": "project_id_here",
+  "assigneeId": "user_id_here",
+  "dueDate": "2024-01-31T23:59:59.000Z"
+}
+
+### 2. 创建简单任务（无项目关联）
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "编写API文档",
+  "description": "为所有API端点编写详细的文档",
+  "priority": "MEDIUM",
+  "dueDate": "2024-02-15T18:00:00.000Z"
+}
+
+### 3. 获取任务列表
+GET {{baseUrl}}/api/tasks?page=1&limit=10
+Authorization: {{token}}
+
+### 4. 获取任务列表（带筛选）
+GET {{baseUrl}}/api/tasks?status=TODO&priority=HIGH&page=1&limit=5
+Authorization: {{token}}
+
+### 5. 获取我的任务
+GET {{baseUrl}}/api/tasks/my?page=1&limit=10
+Authorization: {{token}}
+
+### 6. 获取我创建的任务
+GET {{baseUrl}}/api/tasks/created?page=1&limit=10
+Authorization: {{token}}
+
+### 7. 获取单个任务
+GET {{baseUrl}}/api/tasks/task_id_here
+Authorization: {{token}}
+
+### 8. 更新任务
+PUT {{baseUrl}}/api/tasks/task_id_here
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "实现用户认证功能（已更新）",
+  "description": "完成JWT认证系统的开发，包括注册、登录、权限验证等功能。添加了刷新令牌功能。",
+  "priority": "URGENT",
+  "status": "IN_PROGRESS"
+}
+
+### 9. 分配任务
+PATCH {{baseUrl}}/api/tasks/task_id_here/assign
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "assigneeId": "new_assignee_id_here"
+}
+
+### 10. 更新任务状态
+PATCH {{baseUrl}}/api/tasks/task_id_here/status
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "status": "COMPLETED"
+}
+
+### 11. 更新任务状态为进行中
+PATCH {{baseUrl}}/api/tasks/task_id_here/status
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "status": "IN_PROGRESS"
+}
+
+### 12. 更新任务状态为已取消
+PATCH {{baseUrl}}/api/tasks/task_id_here/status
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "status": "CANCELLED"
+}
+
+### 13. 删除任务
+DELETE {{baseUrl}}/api/tasks/task_id_here
+Authorization: {{token}}
+
+### 14. 搜索任务
+GET {{baseUrl}}/api/tasks?search=认证&page=1&limit=10
+Authorization: {{token}}
+
+### 15. 按截止日期筛选任务
+GET {{baseUrl}}/api/tasks?dueDateFrom=2024-01-01T00:00:00.000Z&dueDateTo=2024-12-31T23:59:59.000Z
+Authorization: {{token}}
+
+### 16. 测试错误情况 - 创建任务缺少标题
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "description": "缺少标题的任务",
+  "priority": "LOW"
+}
+
+### 17. 测试错误情况 - 无效的任务状态
+PATCH {{baseUrl}}/api/tasks/task_id_here/status
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "status": "INVALID_STATUS"
+}
+
+### 18. 测试错误情况 - 无效的优先级
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "测试任务",
+  "priority": "INVALID_PRIORITY"
+}
+
+### 19. 测试权限 - 访问他人任务
+GET {{baseUrl}}/api/tasks/other_user_task_id
+Authorization: {{token}}
+
+### 20. 测试权限 - 编辑他人任务
+PUT {{baseUrl}}/api/tasks/other_user_task_id
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "尝试编辑他人任务"
+}
