@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ProjectService } from '../../services/projects/projectService';
-import { ResponseUtil } from '../../utils/response';
+import { ApiResponseUtil } from '../../utils/apiResponse';
 import { ProjectSearchOptions } from '../../types/pagination';
 
 export class ProjectController {
@@ -15,7 +15,7 @@ export class ProjectController {
     try {
       // 从认证用户获取userId
       if (!req.user) {
-        ResponseUtil.unauthorized(res, '未认证');
+        ApiResponseUtil.unauthorized(res, '未认证', req.context);
         return;
       }
 
@@ -31,19 +31,17 @@ export class ProjectController {
 
       const result = await this.projectService.getAllProjects(req.user.userId, options);
 
-      // 使用分页响应格式
-      const response = {
-        success: true,
-        data: result.data,
-        pagination: result.pagination,
-        message: '获取项目列表成功',
-        timestamp: new Date().toISOString()
-      };
-
-      res.status(200).json(response);
+      ApiResponseUtil.success(
+        res,
+        result.data,
+        '获取项目列表成功',
+        200,
+        req.context,
+        result.pagination
+      );
     } catch (error) {
       console.error('获取项目列表失败:', error);
-      ResponseUtil.serverError(res, '获取项目列表失败');
+      ApiResponseUtil.serverError(res, '获取项目列表失败', undefined, req.context);
     }
   }
 
@@ -54,7 +52,7 @@ export class ProjectController {
 
       // 从认证用户获取ownerId
       if (!req.user) {
-        ResponseUtil.unauthorized(res, '未认证');
+        ApiResponseUtil.unauthorized(res, '未认证', req.context);
         return;
       }
 
@@ -65,9 +63,9 @@ export class ProjectController {
         description,
         deadline: deadline ? new Date(deadline) : null
       });
-      ResponseUtil.created(res, project, '创建项目成功');
+      ApiResponseUtil.created(res, project, '创建项目成功', req.context);
     } catch (error) {
-      ResponseUtil.serverError(res, '创建项目失败');
+      ApiResponseUtil.serverError(res, '创建项目失败', undefined, req.context);
     }
   }
 
@@ -78,13 +76,13 @@ export class ProjectController {
       const project = await this.projectService.getProjectById(id);
 
       if (!project) {
-        ResponseUtil.notFound(res, '项目不存在');
+        ApiResponseUtil.notFound(res, '项目不存在', req.context);
         return;
       }
 
-      ResponseUtil.success(res, project, '获取项目成功');
+      ApiResponseUtil.success(res, project, '获取项目成功', 200, req.context);
     } catch (error) {
-      ResponseUtil.serverError(res, '获取项目失败');
+      ApiResponseUtil.serverError(res, '获取项目失败', undefined, req.context);
     }
   }
 
@@ -96,36 +94,36 @@ export class ProjectController {
 
       // 验证用户认证
       if (!req.user) {
-        ResponseUtil.unauthorized(res, '未认证');
+        ApiResponseUtil.unauthorized(res, '未认证', req.context);
         return;
       }
 
       // 验证角色是否有效
       if (!['VIEWER', 'COLLABORATOR', 'MANAGER'].includes(role)) {
-        ResponseUtil.badRequest(res, '无效的角色类型');
+        ApiResponseUtil.badRequest(res, '无效的角色类型', undefined, req.context);
         return;
       }
 
       // 检查操作者权限（通过中间件已验证，这里再次确认）
       const canManage = await this.projectService.canManageMembers(req.user.userId, projectId);
       if (!canManage) {
-        ResponseUtil.forbidden(res, '无权限管理项目成员');
+        ApiResponseUtil.forbidden(res, '无权限管理项目成员', req.context);
         return;
       }
 
       const member = await this.projectService.addProjectMember(projectId, userId, role as 'VIEWER' | 'COLLABORATOR' | 'MANAGER');
-      ResponseUtil.created(res, member, '添加项目成员成功');
+      ApiResponseUtil.created(res, member, '添加项目成员成功', req.context);
     } catch (error) {
       if (error instanceof Error) {
         if (error.message.includes('项目不存在') || error.message.includes('用户不存在')) {
-          ResponseUtil.notFound(res, error.message);
+          ApiResponseUtil.notFound(res, error.message, req.context);
         } else if (error.message.includes('已经是项目成员')) {
-          ResponseUtil.badRequest(res, error.message);
+          ApiResponseUtil.badRequest(res, error.message, undefined, req.context);
         } else {
-          ResponseUtil.serverError(res, '添加项目成员失败');
+          ApiResponseUtil.serverError(res, '添加项目成员失败', undefined, req.context);
         }
       } else {
-        ResponseUtil.serverError(res, '添加项目成员失败');
+        ApiResponseUtil.serverError(res, '添加项目成员失败', undefined, req.context);
       }
     }
   }
@@ -137,21 +135,21 @@ export class ProjectController {
 
       // 验证用户认证
       if (!req.user) {
-        ResponseUtil.unauthorized(res, '未认证');
+        ApiResponseUtil.unauthorized(res, '未认证', req.context);
         return;
       }
 
       // 检查用户是否有权限访问项目
       const hasAccess = await this.projectService.canManageMembers(req.user.userId, projectId);
       if (!hasAccess) {
-        ResponseUtil.forbidden(res, '无权限查看项目成员');
+        ApiResponseUtil.forbidden(res, '无权限查看项目成员', req.context);
         return;
       }
 
       const members = await this.projectService.getProjectMembers(projectId);
-      ResponseUtil.success(res, members, '获取项目成员成功');
+      ApiResponseUtil.success(res, members, '获取项目成员成功', 200, req.context);
     } catch (error) {
-      ResponseUtil.serverError(res, '获取项目成员失败');
+      ApiResponseUtil.serverError(res, '获取项目成员失败', undefined, req.context);
     }
   }
 
@@ -163,27 +161,27 @@ export class ProjectController {
 
       // 验证用户认证
       if (!req.user) {
-        ResponseUtil.unauthorized(res, '未认证');
+        ApiResponseUtil.unauthorized(res, '未认证', req.context);
         return;
       }
 
       // 验证角色是否有效
       if (!['VIEWER', 'COLLABORATOR', 'MANAGER'].includes(role)) {
-        ResponseUtil.badRequest(res, '无效的角色类型');
+        ApiResponseUtil.badRequest(res, '无效的角色类型', undefined, req.context);
         return;
       }
 
       // 检查操作者权限
       const canManage = await this.projectService.canManageMembers(req.user.userId, projectId);
       if (!canManage) {
-        ResponseUtil.forbidden(res, '无权限管理项目成员');
+        ApiResponseUtil.forbidden(res, '无权限管理项目成员', req.context);
         return;
       }
 
       const member = await this.projectService.updateProjectMemberRole(projectId, userId, role as 'VIEWER' | 'COLLABORATOR' | 'MANAGER');
-      ResponseUtil.success(res, member, '更新成员角色成功');
+      ApiResponseUtil.success(res, member, '更新成员角色成功', 200, req.context);
     } catch (error) {
-      ResponseUtil.serverError(res, '更新成员角色失败');
+      ApiResponseUtil.serverError(res, '更新成员角色失败', undefined, req.context);
     }
   }
 
@@ -194,21 +192,21 @@ export class ProjectController {
 
       // 验证用户认证
       if (!req.user) {
-        ResponseUtil.unauthorized(res, '未认证');
+        ApiResponseUtil.unauthorized(res, '未认证', req.context);
         return;
       }
 
       // 检查操作者权限
       const canManage = await this.projectService.canManageMembers(req.user.userId, projectId);
       if (!canManage) {
-        ResponseUtil.forbidden(res, '无权限管理项目成员');
+        ApiResponseUtil.forbidden(res, '无权限管理项目成员', req.context);
         return;
       }
 
       await this.projectService.removeProjectMember(projectId, userId);
-      ResponseUtil.success(res, null, '成员已移除');
+      ApiResponseUtil.success(res, null, '成员已移除', 200, req.context);
     } catch (error) {
-      ResponseUtil.serverError(res, '移除成员失败');
+      ApiResponseUtil.serverError(res, '移除成员失败', undefined, req.context);
     }
   }
 }

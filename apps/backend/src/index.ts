@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import routes from './routes';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { enhancedErrorHandler, notFoundHandler } from './middleware/errorHandler';
 import { setupSwagger } from './swagger-setup';
 
 const app = express();
@@ -21,7 +21,7 @@ app.use('/', routes);
 
 // 错误处理中间件
 app.use(notFoundHandler);
-app.use(errorHandler);
+app.use(enhancedErrorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

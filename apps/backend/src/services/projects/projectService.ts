@@ -15,7 +15,7 @@ export class ProjectService {
   private cacheService = new ProjectCacheService();
 
   // 获取用户有权限访问的项目列表（带分页和搜索）
-  async getAllProjects(userId: string, options: ProjectSearchOptions = {}): Promise<PaginationResult<any>> {
+  async getAllProjects(userId: string, options: Partial<ProjectSearchOptions> = {}): Promise<PaginationResult<any>> {
     const {
       page = 1,
       limit = 20,
@@ -29,7 +29,7 @@ export class ProjectService {
     const cacheKey = { userId, ...options };
     const cachedResult = this.cacheService.getUserProjects(userId, cacheKey);
     if (cachedResult) {
-      return cachedResult;
+      return cachedResult as unknown as PaginationResult<any>;
     }
 
     // 构建查询条件
@@ -85,7 +85,6 @@ export class ProjectService {
           },
           _count: {
             select: {
-              tasks: true,
               members: true
             }
           }
@@ -112,7 +111,7 @@ export class ProjectService {
     };
 
     // 缓存结果
-    this.cacheService.setUserProjects(userId, result, cacheKey);
+    this.cacheService.setUserProjects(userId, result.data, cacheKey);
 
     return result;
   }
