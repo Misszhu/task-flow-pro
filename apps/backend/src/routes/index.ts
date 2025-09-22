@@ -5,6 +5,9 @@ import authRoutes from './auth/auth.routes';
 import taskRoutes from './tasks/task.routes';
 import taskCollaborationRoutes from './tasks/taskCollaboration.routes';
 import cacheRoutes from './cache/cache.routes';
+import notificationRoutes from './notifications/notification.routes';
+import fileUploadRoutes from './files/fileUpload.routes';
+import timeTrackingRoutes from './timeTracking/timeTracking.routes';
 import v1Routes from './v1/index';
 import { apiVersioning, addVersionInfo } from '../middleware/versioning';
 import { globalRateLimit } from '../middleware/rateLimiting';
@@ -27,6 +30,9 @@ router.use('/api/auth', authRoutes);
 router.use('/api/projects', projectRoutes);
 router.use('/api/tasks', taskRoutes);
 router.use('/api/tasks', taskCollaborationRoutes);
+router.use('/api/notifications', notificationRoutes);
+router.use('/api/files', fileUploadRoutes);
+router.use('/api/time-tracking', timeTrackingRoutes);
 router.use('/api/cache', cacheRoutes);
 
 // 版本化 API 路由
