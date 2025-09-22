@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma';
 import { MemberRole } from '@prisma/client';
+import { ProjectCacheService } from '../cache/cacheService';
 
 export interface ProjectMembership {
   id: string;
@@ -22,6 +23,8 @@ export interface ProjectAccessResult {
 }
 
 export class ProjectPermissionService {
+  private static cacheService = new ProjectCacheService();
+
   /**
    * 检查用户是否有权限访问项目
    */
@@ -31,15 +34,23 @@ export class ProjectPermissionService {
     requiredRole?: MemberRole
   ): Promise<ProjectAccessResult> {
     try {
-      // 首先检查用户是否是项目成员
-      const membership = await prisma.projectMember.findUnique({
-        where: {
-          projectId_userId: {
-            projectId,
-            userId
+      // 首先尝试从缓存获取成员关系
+      let membership = this.cacheService.getProjectMembership(projectId, userId);
+
+      if (!membership) {
+        // 缓存未命中，从数据库查询
+        membership = await prisma.projectMember.findUnique({
+          where: {
+            projectId_userId: {
+              projectId,
+              userId
+            }
           }
-        }
-      });
+        });
+
+        // 将结果存入缓存
+        this.cacheService.setProjectMembership(projectId, userId, membership);
+      }
 
       if (membership) {
         // 检查角色权限

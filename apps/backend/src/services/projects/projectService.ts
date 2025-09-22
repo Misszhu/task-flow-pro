@@ -1,5 +1,7 @@
 import { prisma } from '../../lib/prisma';
 import { ProjectPermissionService } from './projectPermissionService';
+import { ProjectCacheService } from '../cache/cacheService';
+import { ProjectSearchOptions, PaginationResult } from '../../types/pagination';
 
 export interface CreateProjectData {
   name: string;
@@ -10,9 +12,109 @@ export interface CreateProjectData {
 }
 
 export class ProjectService {
-  // 获取用户有权限访问的项目列表
-  async getAllProjects(userId: string) {
-    return await ProjectPermissionService.getUserAccessibleProjects(userId);
+  private cacheService = new ProjectCacheService();
+
+  // 获取用户有权限访问的项目列表（带分页和搜索）
+  async getAllProjects(userId: string, options: ProjectSearchOptions = {}): Promise<PaginationResult<any>> {
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      visibility,
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    } = options;
+
+    // 检查缓存
+    const cacheKey = { userId, ...options };
+    const cachedResult = this.cacheService.getUserProjects(userId, cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
+
+    // 构建查询条件
+    const where: any = {
+      OR: [
+        { ownerId: userId },
+        { members: { some: { userId } } }
+      ]
+    };
+
+    // 添加搜索条件
+    if (search) {
+      where.AND = [
+        {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } }
+          ]
+        }
+      ];
+    }
+
+    // 添加可见性过滤
+    if (visibility) {
+      where.visibility = visibility;
+    }
+
+    // 计算偏移量
+    const skip = (page - 1) * limit;
+
+    // 并行执行查询和计数
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where,
+        include: {
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          },
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          },
+          _count: {
+            select: {
+              tasks: true,
+              members: true
+            }
+          }
+        },
+        orderBy: { [sortBy]: sortOrder },
+        skip,
+        take: limit
+      }),
+      prisma.project.count({ where })
+    ]);
+
+    // 计算分页信息
+    const totalPages = Math.ceil(total / limit);
+    const result: PaginationResult<any> = {
+      data: projects,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    };
+
+    // 缓存结果
+    this.cacheService.setUserProjects(userId, result, cacheKey);
+
+    return result;
   }
 
   // 创建新项目

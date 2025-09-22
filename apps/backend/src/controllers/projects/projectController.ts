@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ProjectService } from '../../services/projects/projectService';
 import { ResponseUtil } from '../../utils/response';
+import { ProjectSearchOptions } from '../../types/pagination';
 
 export class ProjectController {
   private projectService: ProjectService;
@@ -18,9 +19,30 @@ export class ProjectController {
         return;
       }
 
-      const projects = await this.projectService.getAllProjects(req.user.userId);
-      ResponseUtil.success(res, projects, '获取项目列表成功');
+      // 解析查询参数
+      const options: ProjectSearchOptions = {
+        page: parseInt(req.query.page as string) || 1,
+        limit: Math.min(parseInt(req.query.limit as string) || 20, 100), // 最大100条
+        search: req.query.search as string,
+        visibility: req.query.visibility as 'PUBLIC' | 'PRIVATE',
+        sortBy: req.query.sortBy as string || 'createdAt',
+        sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc'
+      };
+
+      const result = await this.projectService.getAllProjects(req.user.userId, options);
+
+      // 使用分页响应格式
+      const response = {
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+        message: '获取项目列表成功',
+        timestamp: new Date().toISOString()
+      };
+
+      res.status(200).json(response);
     } catch (error) {
+      console.error('获取项目列表失败:', error);
       ResponseUtil.serverError(res, '获取项目列表失败');
     }
   }

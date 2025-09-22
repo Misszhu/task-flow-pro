@@ -15,20 +15,85 @@ const projectController = new ProjectController();
  * @swagger
  * /api/projects:
  *   get:
- *     summary: 获取所有项目
- *     description: 获取所有项目列表
+ *     summary: 获取项目列表
+ *     description: 获取用户有权限访问的项目列表，支持分页、搜索和过滤
  *     tags: [Projects]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: 页码
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 20
+ *         description: 每页数量
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: 搜索关键词（项目名称或描述）
+ *       - in: query
+ *         name: visibility
+ *         schema:
+ *           type: string
+ *           enum: [PUBLIC, PRIVATE]
+ *         description: 项目可见性过滤
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [createdAt, updatedAt, name]
+ *           default: createdAt
+ *         description: 排序字段
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: 排序顺序
  *     responses:
  *       200:
  *         description: 成功获取项目列表
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Project'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Project'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     total:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     hasNext:
+ *                       type: boolean
+ *                     hasPrev:
+ *                       type: boolean
+ *                 message:
+ *                   type: string
+ *                 timestamp:
+ *                   type: string
  *       500:
  *         description: 服务器错误
  *         content:
