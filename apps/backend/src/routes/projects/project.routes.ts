@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { ProjectController } from '../../controllers/projects/projectController';
 import { authenticateToken, requireRole } from '../../middleware/auth';
+import {
+  requireProjectAccess,
+  requireMemberManagement,
+  requireProjectEdit,
+  requireProjectDelete
+} from '../../middleware/projectAuth';
 
 const router: Router = Router();
 const projectController = new ProjectController();
@@ -99,7 +105,7 @@ router.post('/', authenticateToken, projectController.createProject.bind(project
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:id', authenticateToken, projectController.getProjectById.bind(projectController));
+router.get('/:id', authenticateToken, requireProjectAccess(), projectController.getProjectById.bind(projectController));
 
 /**
  * @swagger
@@ -149,7 +155,7 @@ router.get('/:id', authenticateToken, projectController.getProjectById.bind(proj
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/:projectId/members', authenticateToken, projectController.addProjectMember.bind(projectController));
+router.post('/:projectId/members', authenticateToken, requireMemberManagement, projectController.addProjectMember.bind(projectController));
 
 /**
  * @swagger
@@ -183,7 +189,7 @@ router.post('/:projectId/members', authenticateToken, projectController.addProje
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/:projectId/members', authenticateToken, projectController.getProjectMembers.bind(projectController));
+router.get('/:projectId/members', authenticateToken, requireMemberManagement, projectController.getProjectMembers.bind(projectController));
 
 /**
  * @swagger
@@ -233,7 +239,7 @@ router.get('/:projectId/members', authenticateToken, projectController.getProjec
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/:projectId/members/:userId', authenticateToken, projectController.updateProjectMemberRole.bind(projectController));
+router.put('/:projectId/members/:userId', authenticateToken, requireMemberManagement, projectController.updateProjectMemberRole.bind(projectController));
 
 /**
  * @swagger
@@ -275,6 +281,6 @@ router.put('/:projectId/members/:userId', authenticateToken, projectController.u
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/:projectId/members/:userId', authenticateToken, projectController.removeProjectMember.bind(projectController));
+router.delete('/:projectId/members/:userId', authenticateToken, requireMemberManagement, projectController.removeProjectMember.bind(projectController));
 
 export default router;

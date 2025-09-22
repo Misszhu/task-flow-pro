@@ -12,7 +12,13 @@ export class ProjectController {
   // 获取所有项目
   async getAllProjects(req: Request, res: Response): Promise<void> {
     try {
-      const projects = await this.projectService.getAllProjects();
+      // 从认证用户获取userId
+      if (!req.user) {
+        ResponseUtil.unauthorized(res, '未认证');
+        return;
+      }
+
+      const projects = await this.projectService.getAllProjects(req.user.userId);
       ResponseUtil.success(res, projects, '获取项目列表成功');
     } catch (error) {
       ResponseUtil.serverError(res, '获取项目列表失败');
@@ -66,25 +72,38 @@ export class ProjectController {
       const { projectId } = req.params;
       const { userId, role = 'VIEWER' } = req.body;
 
+      // 验证用户认证
+      if (!req.user) {
+        ResponseUtil.unauthorized(res, '未认证');
+        return;
+      }
+
       // 验证角色是否有效
       if (!['VIEWER', 'COLLABORATOR', 'MANAGER'].includes(role)) {
-        res.status(400).json({ error: '无效的角色类型' });
+        ResponseUtil.badRequest(res, '无效的角色类型');
+        return;
+      }
+
+      // 检查操作者权限（通过中间件已验证，这里再次确认）
+      const canManage = await this.projectService.canManageMembers(req.user.userId, projectId);
+      if (!canManage) {
+        ResponseUtil.forbidden(res, '无权限管理项目成员');
         return;
       }
 
       const member = await this.projectService.addProjectMember(projectId, userId, role as 'VIEWER' | 'COLLABORATOR' | 'MANAGER');
-      res.status(201).json(member);
+      ResponseUtil.created(res, member, '添加项目成员成功');
     } catch (error) {
       if (error instanceof Error) {
         if (error.message.includes('项目不存在') || error.message.includes('用户不存在')) {
-          res.status(404).json({ error: error.message });
+          ResponseUtil.notFound(res, error.message);
         } else if (error.message.includes('已经是项目成员')) {
-          res.status(400).json({ error: error.message });
+          ResponseUtil.badRequest(res, error.message);
         } else {
-          res.status(500).json({ error: '添加项目成员失败', details: error.message });
+          ResponseUtil.serverError(res, '添加项目成员失败');
         }
       } else {
-        res.status(500).json({ error: '添加项目成员失败', details: error });
+        ResponseUtil.serverError(res, '添加项目成员失败');
       }
     }
   }
@@ -93,10 +112,24 @@ export class ProjectController {
   async getProjectMembers(req: Request, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
+
+      // 验证用户认证
+      if (!req.user) {
+        ResponseUtil.unauthorized(res, '未认证');
+        return;
+      }
+
+      // 检查用户是否有权限访问项目
+      const hasAccess = await this.projectService.canManageMembers(req.user.userId, projectId);
+      if (!hasAccess) {
+        ResponseUtil.forbidden(res, '无权限查看项目成员');
+        return;
+      }
+
       const members = await this.projectService.getProjectMembers(projectId);
-      res.json(members);
+      ResponseUtil.success(res, members, '获取项目成员成功');
     } catch (error) {
-      res.status(500).json({ error: '获取项目成员失败', details: error });
+      ResponseUtil.serverError(res, '获取项目成员失败');
     }
   }
 
@@ -106,16 +139,29 @@ export class ProjectController {
       const { projectId, userId } = req.params;
       const { role } = req.body;
 
+      // 验证用户认证
+      if (!req.user) {
+        ResponseUtil.unauthorized(res, '未认证');
+        return;
+      }
+
       // 验证角色是否有效
       if (!['VIEWER', 'COLLABORATOR', 'MANAGER'].includes(role)) {
-        res.status(400).json({ error: '无效的角色类型' });
+        ResponseUtil.badRequest(res, '无效的角色类型');
+        return;
+      }
+
+      // 检查操作者权限
+      const canManage = await this.projectService.canManageMembers(req.user.userId, projectId);
+      if (!canManage) {
+        ResponseUtil.forbidden(res, '无权限管理项目成员');
         return;
       }
 
       const member = await this.projectService.updateProjectMemberRole(projectId, userId, role as 'VIEWER' | 'COLLABORATOR' | 'MANAGER');
-      res.json(member);
+      ResponseUtil.success(res, member, '更新成员角色成功');
     } catch (error) {
-      res.status(500).json({ error: '更新成员角色失败', details: error });
+      ResponseUtil.serverError(res, '更新成员角色失败');
     }
   }
 
@@ -123,10 +169,24 @@ export class ProjectController {
   async removeProjectMember(req: Request, res: Response): Promise<void> {
     try {
       const { projectId, userId } = req.params;
+
+      // 验证用户认证
+      if (!req.user) {
+        ResponseUtil.unauthorized(res, '未认证');
+        return;
+      }
+
+      // 检查操作者权限
+      const canManage = await this.projectService.canManageMembers(req.user.userId, projectId);
+      if (!canManage) {
+        ResponseUtil.forbidden(res, '无权限管理项目成员');
+        return;
+      }
+
       await this.projectService.removeProjectMember(projectId, userId);
-      res.json({ message: '成员已移除' });
+      ResponseUtil.success(res, null, '成员已移除');
     } catch (error) {
-      res.status(500).json({ error: '移除成员失败', details: error });
+      ResponseUtil.serverError(res, '移除成员失败');
     }
   }
 }

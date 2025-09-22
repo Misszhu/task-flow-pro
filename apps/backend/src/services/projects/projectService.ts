@@ -1,4 +1,5 @@
 import { prisma } from '../../lib/prisma';
+import { ProjectPermissionService } from './projectPermissionService';
 
 export interface CreateProjectData {
   name: string;
@@ -9,19 +10,9 @@ export interface CreateProjectData {
 }
 
 export class ProjectService {
-  // 获取所有项目
-  async getAllProjects() {
-    return await prisma.project.findMany({
-      include: {
-        owner: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
-      }
-    });
+  // 获取用户有权限访问的项目列表
+  async getAllProjects(userId: string) {
+    return await ProjectPermissionService.getUserAccessibleProjects(userId);
   }
 
   // 创建新项目
@@ -173,5 +164,20 @@ export class ProjectService {
         }
       }
     });
+  }
+
+  // 检查用户是否可以管理项目成员
+  async canManageMembers(userId: string, projectId: string): Promise<boolean> {
+    return await ProjectPermissionService.canManageMembers(userId, projectId);
+  }
+
+  // 检查用户是否可以编辑项目
+  async canEditProject(userId: string, projectId: string): Promise<boolean> {
+    return await ProjectPermissionService.canEditProject(userId, projectId);
+  }
+
+  // 检查用户是否可以删除项目
+  async canDeleteProject(userId: string, projectId: string): Promise<boolean> {
+    return await ProjectPermissionService.canDeleteProject(userId, projectId);
   }
 }

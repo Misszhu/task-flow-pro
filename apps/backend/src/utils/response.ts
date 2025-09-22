@@ -52,6 +52,13 @@ export class ResponseUtil {
   }
 
   /**
+   * 请求参数错误响应
+   */
+  static badRequest(res: Response, message: string = 'bad request'): void {
+    this.error(res, message, 400);
+  }
+
+  /**
    * 禁止访问响应
    */
   static forbidden(res: Response, message: string = 'forbidden'): void {
