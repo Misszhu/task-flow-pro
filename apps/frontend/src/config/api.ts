@@ -1,7 +1,7 @@
 // API 配置文件
 export const API_CONFIG = {
-  // 基础 URL
-  BASE_URL: process.env.REACT_APP_BASE_URL || 'http://localhost:3001',
+  // 基础 URL - 从环境变量读取
+  BASE_URL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001',
 
   // API 版本
   API_VERSION: '/api',
@@ -20,6 +20,11 @@ export const API_CONFIG = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+
+  // 环境信息
+  ENV: process.env.REACT_APP_ENV || 'development',
+  DEBUG: process.env.REACT_APP_DEBUG === 'true',
+  LOG_LEVEL: process.env.REACT_APP_LOG_LEVEL || 'info',
 } as const;
 
 // API 端点配置
