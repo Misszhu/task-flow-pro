@@ -1,0 +1,24 @@
+.appLayout {
+  min-height: 100vh;
+}
+
+.appLayoutBody {
+  min-height: calc(100vh - 64px);
+}
+
+.appLayoutContent {
+  min-height: 100%;
+}
+
+.appContent {
+  padding: 24px;
+  background: #f0f2f5;
+  min-height: calc(100vh - 64px - 70px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .appContent {
+    padding: 16px;
+  }
+}

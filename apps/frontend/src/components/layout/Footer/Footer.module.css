@@ -1,0 +1,47 @@
+.appFooter {
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  padding: 16px 24px;
+  text-align: center;
+}
+
+.footerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footerLeft {
+  color: #666;
+  font-size: 14px;
+}
+
+.footerRight {
+  display: flex;
+  gap: 24px;
+}
+
+.footerRight a {
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.footerRight a:hover {
+  color: #1890ff;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .footerContent {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .footerRight {
+    gap: 16px;
+  }
+}
