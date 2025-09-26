@@ -1,8 +1,22 @@
 .appFooter {
-  background: #fff;
-  border-top: 1px solid #f0f0f0;
-  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px 24px;
   text-align: center;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.appFooter::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
 }
 
 .footerContent {
@@ -11,11 +25,14 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .footerLeft {
   color: #666;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .footerRight {
@@ -27,21 +44,63 @@
   color: #666;
   text-decoration: none;
   font-size: 14px;
-  transition: color 0.3s;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.footerRight a::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
 }
 
 .footerRight a:hover {
-  color: #1890ff;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  transform: translateY(-1px);
+}
+
+.footerRight a:hover::before {
+  width: 100%;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .footerContent {
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+  }
+  
+  .footerRight {
+    gap: 20px;
+  }
+  
+  .footerRight a {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .appFooter {
+    padding: 16px 12px;
   }
   
   .footerRight {
     gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .footerLeft {
+    font-size: 13px;
   }
 }

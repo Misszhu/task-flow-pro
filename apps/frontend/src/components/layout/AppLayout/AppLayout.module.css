@@ -1,5 +1,6 @@
 .appLayout {
   min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .appLayoutBody {
@@ -12,13 +13,26 @@
 
 .appContent {
   padding: 24px;
-  background: #f0f2f5;
+  background: #f8fafc;
   min-height: calc(100vh - 64px - 70px);
+  border-radius: 12px 12px 0 0;
+  margin: 0 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .appContent {
     padding: 16px;
+    margin: 0 8px;
+    border-radius: 8px 8px 0 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .appContent {
+    padding: 12px;
+    margin: 0 4px;
   }
 }
