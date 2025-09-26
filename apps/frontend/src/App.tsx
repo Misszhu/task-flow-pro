@@ -5,12 +5,13 @@ import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import store from './store';
 import AppRouter from './router/AppRouter';
+import { theme } from './config/theme';
 import './App.css';
 
 function App() {
   return (
     <Provider store={store}>
-      <ConfigProvider locale={zhCN}>
+      <ConfigProvider theme={theme} locale={zhCN}>
         <BrowserRouter>
           <AppRouter />
         </BrowserRouter>
